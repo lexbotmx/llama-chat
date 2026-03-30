@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Llama Chat</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0a0a0f;
@@ -17,6 +17,45 @@
     --user-bg: #1a1a2e;
     --ai-bg: #0f0f1a;
     --glow: rgba(124, 106, 255, 0.15);
+    --header-bg: rgba(10,10,15,0.9);
+    --input-area-bg: rgba(10,10,15,0.95);
+  }
+
+  body.light {
+    --bg: #f4f4f8;
+    --surface: #ffffff;
+    --border: #dddde8;
+    --accent: #6255e0;
+    --accent2: #e0558a;
+    --text: #1a1a2e;
+    --muted: #8888aa;
+    --user-bg: #eeeef8;
+    --ai-bg: #f9f9fc;
+    --glow: rgba(98, 85, 224, 0.12);
+    --header-bg: rgba(244,244,248,0.95);
+    --input-area-bg: rgba(244,244,248,0.98);
+  }
+
+  .theme-toggle {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    transition: all 0.2s;
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+
+  .theme-toggle:hover {
+    border-color: var(--accent);
+    color: var(--accent);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -73,7 +112,7 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    background: rgba(10,10,15,0.9);
+    background: var(--header-bg);
     backdrop-filter: blur(10px);
   }
 
@@ -91,10 +130,11 @@
   }
 
   .header-text h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: 18px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
     font-weight: 800;
-    letter-spacing: -0.5px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
     background: linear-gradient(135deg, var(--text), var(--accent));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -207,9 +247,11 @@
   }
 
   .empty-state h2 {
-    font-family: 'Syne', sans-serif;
-    font-size: 24px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px;
     font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
     margin-bottom: 8px;
     background: linear-gradient(135deg, var(--text), var(--accent));
     -webkit-background-clip: text;
@@ -364,7 +406,7 @@
     z-index: 10;
     padding: 20px 32px;
     border-top: 1px solid var(--border);
-    background: rgba(10,10,15,0.95);
+    background: var(--input-area-bg);
     backdrop-filter: blur(10px);
   }
 
@@ -456,6 +498,7 @@
     <div class="status-dot" id="status-dot"></div>
     <span id="status-text">ready</span>
   </div>
+  <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode">🌙</button>
 </header>
 
 <div class="session-bar">
@@ -490,6 +533,21 @@
 </div>
 
 <script>
+  // Dark/light toggle
+  function toggleTheme() {
+    const body = document.body;
+    const btn = document.getElementById('theme-toggle');
+    body.classList.toggle('light');
+    btn.textContent = body.classList.contains('light') ? '🌙' : '☀️';
+    localStorage.setItem('theme', body.classList.contains('light') ? 'light' : 'dark');
+  }
+
+  // Restore saved theme
+  if (localStorage.getItem('theme') === 'light') {
+    document.body.classList.add('light');
+    document.getElementById('theme-toggle').textContent = '🌙';
+  }
+
   const LAMBDA_URL = 'https://r2h3lop5mkvwvvqopo7deypvrm0jenhx.lambda-url.us-west-1.on.aws/';
   const API_KEY = '6NHKZncxtu8THku5Ym7No0HTxnYhGNAr';
 
