@@ -71,37 +71,7 @@
     position: relative;
   }
 
-  /* Animated background grid */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: 
-      linear-gradient(rgba(124,106,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(124,106,255,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
 
-  /* Glowing orb */
-  body::after {
-    content: '';
-    position: fixed;
-    top: -200px;
-    right: -200px;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(124,106,255,0.08) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-    animation: pulse 8s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.1); opacity: 0.7; }
-  }
 
   /* Header */
   header {
@@ -134,7 +104,7 @@
     font-size: 22px;
     font-weight: 800;
     letter-spacing: 0.5px;
-    /* text-transform: uppercase; */
+    text-transform: uppercase;
     background: linear-gradient(135deg, var(--text), var(--accent));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -147,49 +117,9 @@
     margin-top: 2px;
   }
 
-  .status {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 11px;
-    color: var(--muted);
-  }
 
-  .status-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #4ade80;
-    box-shadow: 0 0 8px #4ade80;
-    animation: blink 2s ease-in-out infinite;
-  }
 
-  .status-dot.loading {
-    background: var(--accent);
-    box-shadow: 0 0 8px var(--accent);
-  }
 
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-
-  /* Session ID */
-  .session-bar {
-    position: relative;
-    z-index: 10;
-    padding: 8px 32px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 11px;
-    color: var(--muted);
-  }
-
-  .session-bar span { color: var(--accent); font-weight: 700; }
 
   .new-chat-btn {
     margin-left: auto;
@@ -209,7 +139,14 @@
     color: var(--accent);
   }
 
-  /* Messages area */
+  .empty-state p {
+    font-size: 12px;
+    color: var(--muted);
+    max-width: 400px;
+    line-height: 1.8;
+    margin: 0 auto;
+    text-align: center;
+  }
   #messages {
     flex: 1;
     overflow-y: auto;
@@ -250,7 +187,7 @@
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 28px;
     font-weight: 800;
-    /* text-transform: uppercase; */
+    text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 8px;
     background: linear-gradient(135deg, var(--text), var(--accent));
@@ -259,12 +196,7 @@
     background-clip: text;
   }
 
-  .empty-state p {
-    font-size: 12px;
-    color: var(--muted);
-    max-width: 300px;
-    line-height: 1.8;
-  }
+
 
   .suggestions {
     display: flex;
@@ -489,26 +421,16 @@
 <body>
 
 <header>
-  <div class="logo">🦙</div>
   <div class="header-text">
     <h1>Llama Chat</h1>
-    <p>Powered by Llama 3.2 · AWS Lambda</p>
+    <p>Powered by SmolLM2 · AWS Lambda</p>
   </div>
-  <div class="status">
-    <div class="status-dot" id="status-dot"></div>
-    <span id="status-text">ready</span>
-  </div>
+  <button class="new-chat-btn" onclick="newChat()">+ new chat</button>
   <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode">🌙</button>
 </header>
 
-<div class="session-bar">
-  session: <span id="session-display">—</span>
-  <button class="new-chat-btn" onclick="newChat()">+ new chat</button>
-</div>
-
 <div id="messages">
   <div class="empty-state" id="empty-state">
-    <div class="big-logo">🦙</div>
     <h2>What's on your mind?</h2>
     <p>Running on your own serverless AWS Lambda. Ask me anything — I remember our conversation.</p>
     <div class="suggestions">
@@ -558,14 +480,14 @@
     return 'session_' + Math.random().toString(36).substr(2, 9);
   }
 
-  document.getElementById('session-display').textContent = sessionId;
+  function setStatus(status) {
+    // Status indicator removed — no-op
+  }
 
   function newChat() {
     sessionId = generateSessionId();
-    document.getElementById('session-display').textContent = sessionId;
     document.getElementById('messages').innerHTML = `
       <div class="empty-state" id="empty-state">
-        <div class="big-logo">🦙</div>
         <h2>What's on your mind?</h2>
         <p>Running on your own serverless AWS Lambda. Ask me anything — I remember our conversation.</p>
         <div class="suggestions">
@@ -580,18 +502,6 @@
   function useSuggestion(el) {
     document.getElementById('prompt').value = el.textContent;
     sendMessage();
-  }
-
-  function setStatus(status) {
-    const dot = document.getElementById('status-dot');
-    const text = document.getElementById('status-text');
-    if (status === 'loading') {
-      dot.className = 'status-dot loading';
-      text.textContent = 'thinking...';
-    } else {
-      dot.className = 'status-dot';
-      text.textContent = 'ready';
-    }
   }
 
   function formatTime() {
@@ -618,7 +528,7 @@
         <div class="avatar">🦙</div>
         <div>
           <div class="bubble">${escapeHtml(content)}</div>
-          <div class="msg-meta">Llama 3.2 · ${formatTime()}</div>
+          <div class="msg-meta">SmolLM2 · ${formatTime()}</div>
         </div>`;
     }
 
